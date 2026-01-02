@@ -27,18 +27,32 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 if (builder.Environment.IsProduction())
 {
-    // Convert Render's DATABASE_URL format to Npgsql format if needed
-    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    // Try to get DATABASE_URL first, then fall back to ConnectionStrings__DefaultConnection
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") 
+                   ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+    
     if (!string.IsNullOrEmpty(databaseUrl))
     {
-        var uri = new Uri(databaseUrl);
-        var userInfo = uri.UserInfo.Split(':');
-        var host = uri.Host;
-        var portNum = uri.Port > 0 ? uri.Port : 5432;
-        var database = uri.AbsolutePath.TrimStart('/');
-        var username = userInfo[0];
-        var password = userInfo.Length > 1 ? userInfo[1] : "";
-        connectionString = $"Host={host};Port={portNum};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        // Check if it's a URL format (postgres:// or postgresql://)
+        if (databaseUrl.StartsWith("postgres://") || databaseUrl.StartsWith("postgresql://"))
+        {
+            // Replace postgresql:// with postgres:// for Uri parsing
+            databaseUrl = databaseUrl.Replace("postgresql://", "postgres://");
+            
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            var host = uri.Host;
+            var portNum = uri.Port > 0 ? uri.Port : 5432;
+            var database = uri.AbsolutePath.TrimStart('/');
+            var username = userInfo[0];
+            var password = userInfo.Length > 1 ? userInfo[1] : "";
+            connectionString = $"Host={host};Port={portNum};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        }
+        else
+        {
+            // Already in Npgsql format
+            connectionString = databaseUrl;
+        }
     }
     
     // PostgreSQL for Render deployment
