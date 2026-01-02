@@ -1,0 +1,35 @@
+@model Project.Models.Class
+
+<h1>Edit Class</h1>
+<form method="post">
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <div>
+        <label>Class Name</label>
+        <input name="ClassName" value="@Model.ClassName" />
+    </div>
+    <div>
+        <label>Teacher</label>
+        <select name="TeacherId">
+            @{ var teachers = ViewBag.Teachers as List<Project.Models.Teacher>; }
+            @if (teachers != null)
+            {
+                foreach (var t in teachers)
+                {
+                    if (t.Id == Model.TeacherId)
+                    {
+                        <option value="@t.Id" selected="selected">@t.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@t.Id">@t.Name</option>
+                    }
+                }
+            }
+        </select>
+    </div>
+    <div>
+        <label>Num Students</label>
+        <input name="NumStudents" value="@Model.NumStudents" />
+    </div>
+    <button type="submit">Save</button>
+</form>

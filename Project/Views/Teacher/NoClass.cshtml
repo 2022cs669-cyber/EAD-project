@@ -1,0 +1,26 @@
+@{
+    var teacher = ViewBag.TeacherName as string ?? "Teacher";
+    var todays = ViewBag.TodaysTimeTables as List<Project.Models.TimeTable> ?? new List<Project.Models.TimeTable>();
+    var now = ViewBag.CurrentTime as TimeSpan? ?? TimeSpan.Zero;
+}
+
+<h1>Hello @teacher</h1>
+<p>There is no scheduled class right now. You can view your timetable or check back during your scheduled class time.</p>
+
+@if (todays.Any())
+{
+    <h3>Today's timetable</h3>
+    <p>Current time: @now</p>
+    <ul>
+        @foreach (var tt in todays)
+        {
+            <li>@tt.Class?.ClassName - @tt.Day - @tt.StartTime to @tt.EndTime (Section: @(tt.Section?.Name ?? "Any"))</li>
+        }
+    </ul>
+}
+else
+{
+    <div class="alert alert-info">You have no timetable entries for today.</div>
+}
+
+<p><a asp-controller="Teacher" asp-action="Dashboard" asp-route-id="@Context.Session.GetInt32("TeacherId")">Refresh</a></p>

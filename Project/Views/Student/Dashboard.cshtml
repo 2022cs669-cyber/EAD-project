@@ -1,0 +1,144 @@
+@model Project.Models.Student
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f4f6f9;
+        }
+
+        .top-header {
+            background-color: #FF8C42;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 3px solid white;
+        }
+
+        .header-content h1 {
+            margin: 0;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        .left-navigation {
+            width: 240px;
+            background-color: #2E3B4E;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        .profile {
+            margin-bottom: 30px;
+        }
+
+        .navigation-buttons {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #FF8C42;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background-color: #E67A2A;
+        }
+
+        .main-content {
+            flex: 1;
+            background-color: #ffffff;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .greeting h2 {
+            font-size: 28px;
+            color: #2E3B4E;
+            margin-bottom: 15px;
+        }
+
+        .greeting p {
+            color: #7f8c8d;
+        }
+
+        .bottom-progress {
+            background-color: #2E3B4E;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <div class="header-content">
+            <h1>Student Dashboard</h1>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="left-navigation">
+            <div class="profile"></div>
+            <div class="navigation-buttons">
+                <a href="@Url.Action("Profile", "Student")" class="nav-button">Profile</a>
+                <a href="@Url.Action("CourseRegister", "Register", new { id = Model.Id })" class="nav-button">Course Register</a>
+                <a href="@Url.Action("Attendance", "Attend", new { id = Model.Id })" class="nav-button">Attendance</a>
+                <a href="@Url.Action("Logout", "Account")" class="nav-button">Sign Out</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="greeting">
+                <h2>Welcome, @Model.Name</h2>
+                <p>Manage your attendance, course registration, and more.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-progress">
+        <div></div>
+        <span></span>
+    </div>
+</body>
+</html>

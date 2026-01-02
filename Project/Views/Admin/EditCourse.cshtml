@@ -1,0 +1,15 @@
+@model Project.Models.Course
+
+<h1>Edit Course</h1>
+<form method="post">
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <div>
+        <label>Title</label>
+        <input name="Title" value="@Model.Title" />
+    </div>
+    <div>
+        <label>Code</label>
+        <input name="Code" value="@Model.Code" />
+    </div>
+    <button type="submit">Save</button>
+</form>

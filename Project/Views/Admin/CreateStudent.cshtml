@@ -1,0 +1,27 @@
+@model Project.Models.Student
+
+<h1>Create Student</h1>
+<form method="post">
+    <div class="form-group">
+        <label>Name</label>
+        <input class="form-control" name="Name" />
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input class="form-control" name="Email" />
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input class="form-control" name="Password" />
+    </div>
+    <div class="form-group">
+        <label>Section</label>
+        <select class="form-control" name="SectionId">
+            @foreach (var sec in ViewBag.Sections as List<Project.Models.Section>)
+            {
+                <option value="@sec.Id">@sec.Batch.Name - @sec.Name</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>

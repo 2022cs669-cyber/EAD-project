@@ -1,0 +1,74 @@
+@model dynamic
+
+<div class="row">
+    <div class="col-md-12">
+        <h1>Admin Dashboard</h1>
+        <p class="text-muted">Overview</p>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-4">
+        <a asp-controller="Admin" asp-action="Batches" class="text-white text-decoration-none">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Batches</h5>
+                    <p class="card-text">@Model.Batches</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Admin" asp-action="Sections" class="text-white text-decoration-none">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Sections</h5>
+                    <p class="card-text">@Model.Sections</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Admin" asp-action="Courses" class="text-white text-decoration-none">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Courses</h5>
+                    <p class="card-text">@Model.Courses</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <a asp-controller="Admin" asp-action="Classes" class="text-white text-decoration-none">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Classes</h5>
+                    <p class="card-text">@Model.Classes</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Admin" asp-action="Students" class="text-white text-decoration-none">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Students</h5>
+                    <p class="card-text">@Model.Students</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Admin" asp-action="Teachers" class="text-white text-decoration-none">
+            <div class="card text-white bg-dark mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Teachers</h5>
+                    <p class="card-text">@Model.Teachers</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>

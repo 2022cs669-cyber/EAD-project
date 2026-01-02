@@ -1,0 +1,40 @@
+@model List<Project.Models.TimeTable>
+
+<h1>Time Tables</h1>
+
+<p><a class="btn btn-success" asp-action="CreateTimeTable">Create TimeTable</a></p>
+
+<div class="mb-2 text-muted">Total rows: @Model?.Count()</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">No timetable entries found.</div>
+}
+else
+{
+    <table class="table">
+        <thead><tr><th>Id</th><th>ClassId</th><th>Class</th><th>SectionId</th><th>Section</th><th>Day</th><th>Start</th><th>End</th><th>Actions</th></tr></thead>
+        <tbody>
+            @foreach (var tt in Model)
+            {
+                <tr>
+                    <td>@tt.Id</td>
+                    <td>@tt.ClassId</td>
+                    <td>@(tt.Class != null ? tt.Class.ClassName : "(no class loaded)")</td>
+                    <td>@tt.SectionId</td>
+                    <td>@(tt.Section != null ? tt.Section.Name : "(no section loaded)")</td>
+                    <td>@tt.Day</td>
+                    <td>@tt.StartTime</td>
+                    <td>@tt.EndTime</td>
+                    <td>
+                        <a asp-action="EditTimeTable" asp-route-id="@tt.Id" class="btn btn-sm btn-primary">Edit</a>
+                        <form asp-action="DeleteTimeTable" method="post" style="display:inline">
+                            <input type="hidden" name="id" value="@tt.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,28 @@
+@model List<Project.Models.Batch>
+
+<div class="d-flex justify-content-between align-items-center">
+    <h1>Batches</h1>
+    <a class="btn btn-success" href="@Url.Action("CreateBatch")">Create New Batch</a>
+</div>
+
+<table class="table table-striped mt-3">
+    <thead><tr><th>Id</th><th>Name</th><th>Session</th><th>Sections</th><th>Actions</th></tr></thead>
+    <tbody>
+        @foreach (var b in Model)
+        {
+            <tr>
+                <td>@b.Id</td>
+                <td>@b.Name</td>
+                <td>@(string.IsNullOrEmpty(b.Session) ? "-" : b.Session)</td>
+                <td>@(b.Sections != null ? b.Sections.Count().ToString() : "0")</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("EditBatch", new { id = b.Id })">Edit</a>
+                    <form method="post" asp-action="DeleteBatch" style="display:inline">
+                        <input type="hidden" name="id" value="@b.Id" />
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

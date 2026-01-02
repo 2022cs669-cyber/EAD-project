@@ -1,0 +1,31 @@
+@model Project.Models.Section
+
+<h1>Edit Section</h1>
+<form method="post">
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <div>
+        <label>Name</label>
+        <input name="Name" value="@Model.Name" />
+    </div>
+    <div>
+        <label>Batch</label>
+        <select name="BatchId">
+            @{ var batches = ViewBag.Batches as List<Project.Models.Batch>; }
+            @if (batches != null)
+            {
+                foreach (var b in batches)
+                {
+                    if (b.Id == Model.BatchId)
+                    {
+                        <option value="@b.Id" selected="selected">@b.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@b.Id">@b.Name</option>
+                    }
+                }
+            }
+        </select>
+    </div>
+    <button type="submit">Save</button>
+</form>

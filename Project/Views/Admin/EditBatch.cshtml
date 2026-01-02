@@ -1,0 +1,11 @@
+@model Project.Models.Batch
+
+<h1>Edit Batch</h1>
+<form method="post">
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <div>
+        <label>Name</label>
+        <input name="Name" value="@Model.Name" />
+    </div>
+    <button type="submit">Save</button>
+</form>

@@ -1,0 +1,65 @@
+@model IEnumerable<Project.Models.Class>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Registration</title>
+    <style>
+        body { font-family: Arial, sans-serif; background:#f4f6f9; }
+        .container { max-width:900px; margin:40px auto; background:white; padding:20px; border-radius:6px; }
+        table { width:100%; border-collapse:collapse; }
+        th, td { padding:10px; text-align:left; border-bottom:1px solid #eee; }
+        th { background:#2E3B4E; color:white; }
+        .message { margin-bottom:15px; color:green; }
+        .btn-unregister { background:#f44336; color:white; border:none; padding:8px 12px; border-radius:4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Course Registration</h1>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="message">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="message" style="color: red;">@TempData["Error"]</div>
+        }
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Teacher</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var subject in Model)
+                {
+                    <tr>
+                        <td>@subject.ClassName</td>
+                        <td>@subject.Teacher.Name</td>
+                        <td>
+                            <form method="post" asp-action="CourseRegister" asp-controller="Register">
+                                <input type="hidden" name="studentId" value="@ViewBag.StudentId" />
+                                <input type="hidden" name="classId" value="@subject.Id" />
+                                <button type="submit">Register</button>
+                            </form>
+
+                            <form method="post" asp-action="Unregister" asp-controller="Register">
+                                <input type="hidden" name="studentId" value="@ViewBag.StudentId" />
+                                <input type="hidden" name="classId" value="@subject.Id" />
+                                <button type="submit" class="btn-unregister">Unregister</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

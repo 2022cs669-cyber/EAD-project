@@ -1,0 +1,67 @@
+@model Project.Models.TimeTable
+
+<h1>Edit TimeTable</h1>
+
+<form asp-action="EditTimeTable" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label class="form-label">Class</label>
+        <select name="ClassId" class="form-control">
+            <option value="">-- Select --</option>
+            @foreach (var c in ViewBag.Classes as List<Project.Models.Class>)
+            {
+                if (Model.ClassId == c.Id)
+                {
+                    <option value="@c.Id" selected>@c.ClassName</option>
+                }
+                else
+                {
+                    <option value="@c.Id">@c.ClassName</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Section (optional)</label>
+        <select name="SectionId" class="form-control">
+            <option value="">-- Any --</option>
+            @foreach (var s in ViewBag.Sections as List<Project.Models.Section>)
+            {
+                if (Model.SectionId == s.Id)
+                {
+                    <option value="@s.Id" selected>@s.Name</option>
+                }
+                else
+                {
+                    <option value="@s.Id">@s.Name</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Day</label>
+        <select name="Day" class="form-control">
+            @foreach (var d in ViewBag.Days as List<System.DayOfWeek>)
+            {
+                if (Model.Day == d)
+                {
+                    <option value="@((int)d)" selected>@d</option>
+                }
+                else
+                {
+                    <option value="@((int)d)">@d</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Start Time (HH:mm)</label>
+        <input name="StartTime" value="@(Model.StartTime.ToString())" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">End Time (HH:mm)</label>
+        <input name="EndTime" value="@(Model.EndTime.ToString())" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>

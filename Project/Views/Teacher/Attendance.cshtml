@@ -1,0 +1,72 @@
+@model List<Project.Models.Attendance>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Class Attendance</title>
+</head>
+<body>
+    <h1>Attendance for @ViewBag.ClassName</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    else if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No students found for this class.</div>
+    }
+    else
+    {
+        <form method="post" asp-action="SaveAttendance" asp-controller="Teacher">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="classId" value="@ViewBag.ClassId" />
+            <table class="table">
+                <thead>
+                    <tr><th>Student</th><th>Date</th><th>Present</th><th>Absent</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model)
+                    {
+                        <tr>
+                            <td>@a.Student?.Name</td>
+                            <td>@a.Date.ToShortDateString()</td>
+                            <td>
+                                @* Render Present radio *@
+                                @if (a.Status == "Present")
+                                {
+                                    <input type="radio" id="present_@a.Id" name="status_@a.Id" value="Present" checked />
+                                }
+                                else
+                                {
+                                    <input type="radio" id="present_@a.Id" name="status_@a.Id" value="Present" />
+                                }
+                                <label for="present_@a.Id">Present</label>
+                            </td>
+                            <td>
+                                @* Render Absent radio *@
+                                @if (a.Status == "Absent")
+                                {
+                                    <input type="radio" id="absent_@a.Id" name="status_@a.Id" value="Absent" checked />
+                                }
+                                else
+                                {
+                                    <input type="radio" id="absent_@a.Id" name="status_@a.Id" value="Absent" />
+                                }
+                                <label for="absent_@a.Id">Absent</label>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary">Save Attendance</button>
+        </form>
+    }
+</body>
+</html>

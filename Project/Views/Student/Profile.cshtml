@@ -1,0 +1,49 @@
+@model Project.Models.Student
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            padding: 20px;
+        }
+
+        .details-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="details-card">
+        <h1>Student Details</h1>
+        <p><span class="label">Name:</span> @Model.Name</p>
+        <p><span class="label">Student ID:</span> @Model.Id</p>
+        <p><span class="label">Email:</span> @Model.Email</p>
+        <p><span class="label">Password:</span> @Model.Password</p>
+    </div>
+</body>
+</html>

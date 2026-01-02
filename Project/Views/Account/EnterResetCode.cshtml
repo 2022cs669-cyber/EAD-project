@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Enter Reset Code";
+    var prefillEmail = TempData["ResetEmail"] as string;
+    var devCode = TempData["ResetCode"] as string;
+    var emailError = TempData["EmailError"] as string;
+}
+
+<h2>Enter Reset Code</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form method="post" asp-action="EnterResetCode" asp-controller="Account">
+    @if (!string.IsNullOrEmpty(prefillEmail))
+    {
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="hidden" name="email" value="@prefillEmail" />
+            <div class="form-control-plaintext">@prefillEmail</div>
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="" required />
+        </div>
+    }
+
+    <div class="mb-3">
+        <label for="code" class="form-label">Reset Code</label>
+        <input type="text" class="form-control" id="code" name="code" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@if (!string.IsNullOrEmpty(devCode))
+{
+    <div class="mt-3 alert alert-info">Development: reset code is <strong>@devCode</strong></div>
+}
+
+@if (!string.IsNullOrEmpty(emailError))
+{
+    <div class="mt-3 alert alert-warning"><strong>SMTP error (dev):</strong><pre>@emailError</pre></div>
+}

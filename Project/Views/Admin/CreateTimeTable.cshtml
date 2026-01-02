@@ -1,0 +1,45 @@
+@model Project.Models.TimeTable
+
+<h1>Create TimeTable</h1>
+
+<form asp-action="CreateTimeTable" method="post">
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <label class="form-label">Class</label>
+        <select name="ClassId" class="form-control">
+            <option value="">-- Select --</option>
+            @foreach (var c in ViewBag.Classes as List<Project.Models.Class>)
+            {
+                <option value="@c.Id">@c.ClassName</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Section (optional)</label>
+        <select name="SectionId" class="form-control">
+            <option value="">-- Any --</option>
+            @foreach (var s in ViewBag.Sections as List<Project.Models.Section>)
+            {
+                <option value="@s.Id">@s.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Day</label>
+        <select name="Day" class="form-control">
+            @foreach (var d in ViewBag.Days as List<System.DayOfWeek>)
+            {
+                <option value="@((int)d)">@d</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Start Time (HH:mm)</label>
+        <input name="StartTime" class="form-control" placeholder="09:00" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">End Time (HH:mm)</label>
+        <input name="EndTime" class="form-control" placeholder="10:00" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>

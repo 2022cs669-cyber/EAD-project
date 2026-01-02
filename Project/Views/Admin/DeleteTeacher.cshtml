@@ -1,0 +1,54 @@
+@model Project.Models.Teacher
+
+@{
+    var classes = ViewBag.Classes as List<Project.Models.Class> ?? new List<Project.Models.Class>();
+    var otherTeachers = ViewBag.OtherTeachers as List<Project.Models.Teacher> ?? new List<Project.Models.Teacher>();
+    var modelErrors = TempData["ModelErrors"] as string;
+}
+
+<h1>Delete Teacher</h1>
+
+@if (!string.IsNullOrEmpty(modelErrors))
+{
+    <div class="alert alert-warning">@modelErrors</div>
+}
+
+<div class="mb-3">
+    <strong>@Model.Name</strong> (@Model.Email)
+</div>
+
+@if (!classes.Any())
+{
+    <p>No classes assigned. You can delete this teacher immediately.</p>
+    <form asp-action="DeleteTeacherConfirmed" asp-controller="Admin" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="btn btn-danger">Delete teacher</button>
+    </form>
+}
+else
+{
+    <p>This teacher has the following classes assigned. You must reassign or remove classes before deleting.</p>
+    <ul>
+        @foreach (var c in classes)
+        {
+            <li>@c.ClassName (Id: @c.Id)</li>
+        }
+    </ul>
+
+    <form asp-action="DeleteTeacherConfirmed" asp-controller="Admin" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="mb-3">
+            <label class="form-label">Reassign classes to</label>
+            <select name="reassignTeacherId" class="form-control">
+                <option value="">-- select replacement teacher --</option>
+                @foreach (var t in otherTeachers)
+                {
+                    <option value="@t.Id">@t.Name (@t.Email)</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-danger">Reassign & Delete</button>
+    </form>
+}
