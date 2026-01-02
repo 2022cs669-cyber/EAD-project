@@ -37,7 +37,7 @@ public partial class ApplicationDbContext : DbContext
     {
         modelBuilder.Entity<Attendance>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Attendan__3214EC07EE242C22");
+            entity.HasKey(e => e.Id);
 
             entity.ToTable("Attendance");
 
@@ -45,44 +45,37 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Date).HasColumnName("date");
             entity.Property(e => e.Status)
                 .HasMaxLength(10)
-                .IsFixedLength()
                 .HasColumnName("status");
             entity.Property(e => e.StudentId).HasColumnName("student_id");
 
             entity.HasOne(d => d.Class).WithMany(p => p.Attendances)
                 .HasForeignKey(d => d.ClassId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Attendanc__class__398D8EEE");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Student).WithMany(p => p.Attendances)
                 .HasForeignKey(d => d.StudentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Attendanc__stude__3A81B327");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<Class>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Classes__3214EC0799504F86");
+            entity.HasKey(e => e.Id);
 
             entity.Property(e => e.ClassName)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Created).HasColumnType("datetime");
+                .HasMaxLength(50);
             entity.Property(e => e.NumStudents)
                 .HasMaxLength(50)
-                .IsUnicode(false)
                 .HasColumnName("Num_Students");
             entity.Property(e => e.TeacherId).HasColumnName("TeacherID");
 
             entity.HasOne(d => d.Teacher).WithMany(p => p.Classes)
                 .HasForeignKey(d => d.TeacherId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Classes__Teacher__36B12243");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<Registered>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Register__3214EC073E29BEAD");
+            entity.HasKey(e => e.Id);
 
             entity.ToTable("Registered");
 
@@ -91,50 +84,42 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Class).WithMany(p => p.Registereds)
                 .HasForeignKey(d => d.ClassId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Registere__Class__3E52440B");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Student).WithMany(p => p.Registereds)
                 .HasForeignKey(d => d.StudentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Registere__Stude__3D5E1FD2");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<Student>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Student__3214EC07A2164D8C");
+            entity.HasKey(e => e.Id);
 
             entity.ToTable("Student");
 
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
-                .IsUnicode(false)
                 .HasColumnName("email");
             entity.Property(e => e.Name)
-                .HasMaxLength(100)
-                .IsUnicode(false);
+                .HasMaxLength(100);
             entity.Property(e => e.Password)
                 .HasMaxLength(100)
-                .IsUnicode(false)
                 .HasColumnName("password");
         });
 
         modelBuilder.Entity<Teacher>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Teacher__3214EC07DEC712E6");
+            entity.HasKey(e => e.Id);
 
             entity.ToTable("Teacher");
 
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
-                .IsUnicode(false)
                 .HasColumnName("email");
             entity.Property(e => e.Name)
-                .HasMaxLength(100)
-                .IsUnicode(false);
+                .HasMaxLength(100);
             entity.Property(e => e.Password)
                 .HasMaxLength(100)
-                .IsUnicode(false)
                 .HasColumnName("password");
         });
 
@@ -143,8 +128,7 @@ public partial class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Name)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+                .HasMaxLength(50);
         });
 
         modelBuilder.Entity<Section>(entity =>
@@ -152,8 +136,7 @@ public partial class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Name)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+                .HasMaxLength(50);
 
             entity.HasOne(d => d.Batch)
                 .WithMany(p => p.Sections)
@@ -165,11 +148,9 @@ public partial class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Title)
-                .HasMaxLength(100)
-                .IsUnicode(false);
+                .HasMaxLength(100);
             entity.Property(e => e.Code)
-                .HasMaxLength(20)
-                .IsUnicode(false);
+                .HasMaxLength(20);
         });
 
         modelBuilder.Entity<TimeTable>(entity =>
