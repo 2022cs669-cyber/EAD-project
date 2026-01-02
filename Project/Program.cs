@@ -75,7 +75,7 @@ builder.Services.AddSingleton<Project.Services.EmailService>();
 
 var app = builder.Build();
 
-// Auto-create/migrate database on startup
+// Auto-create/migrate database and seed data on startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -88,6 +88,19 @@ using (var scope = app.Services.CreateScope())
     {
         // For SQL Server - use migrations
         db.Database.Migrate();
+    }
+    
+    // Seed default admin account if not exists
+    if (!db.Teachers.Any(t => t.Email == "admin@example.com"))
+    {
+        db.Teachers.Add(new Teacher
+        {
+            Name = "Admin",
+            Email = "admin@example.com",
+            Password = "admin123"  // Change this password after first login!
+        });
+        db.SaveChanges();
+        Console.WriteLine("? Default admin account created: admin@example.com / admin123");
     }
 }
 
