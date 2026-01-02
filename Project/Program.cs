@@ -57,7 +57,11 @@ if (builder.Environment.IsProduction())
     
     // PostgreSQL for Render deployment
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(connectionString));
+    {
+        options.UseNpgsql(connectionString);
+        // Suppress pending model changes warning for cross-database compatibility
+        options.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+    });
 }
 else
 {
@@ -71,11 +75,20 @@ builder.Services.AddSingleton<Project.Services.EmailService>();
 
 var app = builder.Build();
 
-// Auto-migrate database on startup (useful for Render)
+// Auto-create/migrate database on startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+    if (app.Environment.IsProduction())
+    {
+        // For PostgreSQL - create database if not exists (won't fail if tables exist)
+        db.Database.EnsureCreated();
+    }
+    else
+    {
+        // For SQL Server - use migrations
+        db.Database.Migrate();
+    }
 }
 
 // Add a Content Security Policy report-only header to detect violations without blocking.
