@@ -1,9 +1,10 @@
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["Project.csproj", "."]
-RUN dotnet restore
+COPY ["Project/Project.csproj", "Project/"]
+RUN dotnet restore "Project/Project.csproj"
 COPY . .
+WORKDIR /src/Project
 RUN dotnet publish -c Release -o /app/publish
 
 # Runtime stage
