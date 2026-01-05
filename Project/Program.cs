@@ -74,32 +74,41 @@ builder.Services.AddSingleton<Project.Services.EmailService>();
 var app = builder.Build();
 
 // Auto-create/migrate database and seed data on startup
-using (var scope = app.Services.CreateScope())
+// Wrap in try-catch to prevent startup failures if DB is temporarily unavailable
+try
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if (app.Environment.IsProduction())
+    using (var scope = app.Services.CreateScope())
     {
-        // For PostgreSQL - create database if not exists (won't fail if tables exist)
-        db.Database.EnsureCreated();
-    }
-    else
-    {
-        // For SQL Server - use migrations
-        db.Database.Migrate();
-    }
-    
-    // Seed default admin account if not exists
-    if (!db.Teachers.Any(t => t.Email == "admin@example.com"))
-    {
-        db.Teachers.Add(new Teacher
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        
+        if (app.Environment.IsProduction())
         {
-            Name = "Admin",
-            Email = "admin@example.com",
-            Password = "admin123"  // Change this password after first login!
-        });
-        db.SaveChanges();
-        Console.WriteLine("? Default admin account created: admin@example.com / admin123");
+            // For PostgreSQL - create database if not exists (won't fail if tables exist)
+            db.Database.EnsureCreated();
+        }
+        else
+        {
+            // For SQL Server - use migrations
+            db.Database.Migrate();
+        }
+        
+        // Seed default admin account if not exists
+        if (!db.Teachers.Any(t => t.Email == "admin@example.com"))
+        {
+            db.Teachers.Add(new Teacher
+            {
+                Name = "Admin",
+                Email = "admin@example.com",
+                Password = "admin123"  // Change this password after first login!
+            });
+            db.SaveChanges();
+            Console.WriteLine("? Default admin account created: admin@example.com / admin123");
+        }
     }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Database initialization error (will retry on first request): {ex.Message}");
 }
 
 // Configure the HTTP request pipeline
