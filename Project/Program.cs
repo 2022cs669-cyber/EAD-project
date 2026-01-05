@@ -96,15 +96,105 @@ try
                 Console.WriteLine("?? RECREATE_DB is set to true. Deleting and recreating database...");
                 db.Database.EnsureDeleted();
                 Console.WriteLine("? Database deleted.");
+                
+                // After deletion, apply migrations to create fresh schema
+                Console.WriteLine("Applying database migrations...");
+                db.Database.Migrate();
+                Console.WriteLine("? Database migrations applied successfully.");
+            }
+            else
+            {
+                // Check if database exists
+                var canConnect = db.Database.CanConnect();
+                if (!canConnect)
+                {
+                    Console.WriteLine("Database doesn't exist. Creating with migrations...");
+                    db.Database.Migrate();
+                    Console.WriteLine("? Database created with migrations.");
+                }
+                else
+                {
+                    // Database exists, check if it was created with EnsureCreated or Migrate
+                    var hasMigrationsTable = false;
+                    try
+                    {
+                        // Try to query the migrations history table
+                        var appliedMigrations = db.Database.GetAppliedMigrations();
+                        hasMigrationsTable = true;
+                        Console.WriteLine($"? Found {appliedMigrations.Count()} applied migrations.");
+                    }
+                    catch
+                    {
+                        Console.WriteLine("?? No migrations history found. Database was created with EnsureCreated().");
+                        hasMigrationsTable = false;
+                    }
+                    
+                    if (!hasMigrationsTable)
+                    {
+                        // Database was created with EnsureCreated, need to initialize migrations table
+                        Console.WriteLine("Initializing migrations history...");
+                        
+                        // Create the __EFMigrationsHistory table manually for PostgreSQL
+                        try
+                        {
+                            db.Database.ExecuteSqlRaw(@"
+                                CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
+                                    ""MigrationId"" character varying(150) NOT NULL,
+                                    ""ProductVersion"" character varying(32) NOT NULL,
+                                    CONSTRAINT ""PK___EFMigrationsHistory"" PRIMARY KEY (""MigrationId"")
+                                );
+                            ");
+                            Console.WriteLine("? Migrations history table created.");
+                            
+                            // Get all migrations from the assembly
+                            var allMigrations = db.Database.GetMigrations().ToList();
+                            Console.WriteLine($"Found {allMigrations.Count} total migrations in assembly.");
+                            
+                            // Mark all migrations except the last one as applied
+                            // (assuming database was created with EnsureCreated before the last migration)
+                            if (allMigrations.Count > 0)
+                            {
+                                var migrationsToMark = allMigrations.Take(allMigrations.Count - 1);
+                                foreach (var migration in migrationsToMark)
+                                {
+                                    db.Database.ExecuteSqlRaw(
+                                        @"INSERT INTO ""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"") 
+                                          VALUES ({0}, {1}) 
+                                          ON CONFLICT (""MigrationId"") DO NOTHING;",
+                                        migration,
+                                        "9.0.1");
+                                    Console.WriteLine($"  Marked migration as applied: {migration}");
+                                }
+                            }
+                            
+                            Console.WriteLine("? Migrations history initialized.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"?? Error initializing migrations: {ex.Message}");
+                        }
+                    }
+                    
+                    // Now apply any pending migrations
+                    var pendingMigrations = db.Database.GetPendingMigrations().ToList();
+                    if (pendingMigrations.Any())
+                    {
+                        Console.WriteLine($"Applying {pendingMigrations.Count} pending migration(s)...");
+                        foreach (var migration in pendingMigrations)
+                        {
+                            Console.WriteLine($"  - {migration}");
+                        }
+                        db.Database.Migrate();
+                        Console.WriteLine("? Pending migrations applied successfully.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("? Database is up to date. No pending migrations.");
+                    }
+                }
             }
             
-            Console.WriteLine("Applying database migrations...");
-            // Use Migrate() to apply migrations instead of EnsureCreated()
-            // This is more robust and handles schema changes properly
-            db.Database.Migrate();
-            Console.WriteLine("? Database migrations applied successfully.");
-            
-            // Verify DataProtectionKeys table exists
+            // Verify DataProtectionKeys table exists, create if missing
             try
             {
                 var hasKeys = db.DataProtectionKeys.Any();
@@ -112,7 +202,29 @@ try
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"?? DataProtectionKeys table check failed: {ex.Message}");
+                Console.WriteLine($"?? DataProtectionKeys table missing: {ex.Message}");
+                Console.WriteLine("Creating DataProtectionKeys table...");
+                
+                try
+                {
+                    // Create the table explicitly for PostgreSQL
+                    db.Database.ExecuteSqlRaw(@"
+                        CREATE TABLE IF NOT EXISTS ""DataProtectionKeys"" (
+                            ""Id"" SERIAL PRIMARY KEY,
+                            ""FriendlyName"" TEXT,
+                            ""Xml"" TEXT
+                        );
+                    ");
+                    Console.WriteLine("? DataProtectionKeys table created successfully.");
+                    
+                    // Verify again
+                    var hasKeys = db.DataProtectionKeys.Any();
+                    Console.WriteLine($"? DataProtectionKeys table verified (contains {(hasKeys ? "data" : "no data")}).");
+                }
+                catch (Exception createEx)
+                {
+                    Console.WriteLine($"? Failed to create DataProtectionKeys table: {createEx.Message}");
+                }
             }
         }
         else

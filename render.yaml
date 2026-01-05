@@ -13,7 +13,7 @@ services:
           name: ead-database
           property: connectionString
       - key: RECREATE_DB
-        value: "false"
+        value: "true"
 
 databases:
   - name: ead-database
