@@ -22,12 +22,11 @@ builder.Services.AddSession(options =>
 });
 
 // Register the ApplicationDbContext for Entity Framework
-// Use PostgreSQL for Production (Render), SQL Server for Development
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (builder.Environment.IsProduction())
 {
-    // Try to get DATABASE_URL first, then fall back to ConnectionStrings__DefaultConnection
+    // Try to get DATABASE_URL from environment
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") 
                    ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
     
@@ -55,7 +54,6 @@ if (builder.Environment.IsProduction())
         }
     }
     
-    // PostgreSQL for Render deployment
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {
         options.UseNpgsql(connectionString);
@@ -104,32 +102,16 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Add a Content Security Policy report-only header to detect violations without blocking.
-// This is safe for development and helps find scripts that rely on eval/new Function.
-app.Use(async (context, next) =>
-{
-    // Restrictive policy - no 'unsafe-eval' and allow scripts from self and known CDNs used.
-    var cspReportOnly = "default-src 'self'; " +
-                        "script-src 'self' https://code.jquery.com https://cdn.jsdelivr.net; " +
-                        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
-                        "img-src 'self' data:; " +
-                        "connect-src 'self'; " +
-                        "font-src 'self' https://cdn.jsdelivr.net;";
-
-    context.Response.Headers["Content-Security-Policy-Report-Only"] = cspReportOnly;
-    await next();
-});
-
 // Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    // Enable developer exception page in production temporarily for debugging
+    app.UseDeveloperExceptionPage();
     app.UseHsts();
 }
-
-// Note: Remove UseHttpsRedirection for Render - it handles SSL at proxy level
-if (app.Environment.IsDevelopment())
+else
 {
+    app.UseDeveloperExceptionPage();
     app.UseHttpsRedirection();
 }
 
