@@ -62,7 +62,45 @@ if (builder.Environment.IsProduction())
         options.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
     });
     
-    // Persist Data Protection keys to database for session persistence across deployments
+    // CRITICAL: Create DataProtectionKeys table BEFORE configuring Data Protection
+    // This ensures the table exists when Data Protection system tries to use it
+    Console.WriteLine("Pre-initializing database for Data Protection...");
+    try
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        optionsBuilder.UseNpgsql(connectionString);
+        
+        using (var tempDb = new ApplicationDbContext(optionsBuilder.Options))
+        {
+            // Ensure database exists
+            tempDb.Database.EnsureCreated();
+            
+            // Ensure DataProtectionKeys table exists
+            try
+            {
+                var exists = tempDb.DataProtectionKeys.Any();
+                Console.WriteLine("? DataProtectionKeys table already exists.");
+            }
+            catch
+            {
+                Console.WriteLine("Creating DataProtectionKeys table...");
+                tempDb.Database.ExecuteSqlRaw(@"
+                    CREATE TABLE IF NOT EXISTS ""DataProtectionKeys"" (
+                        ""Id"" SERIAL PRIMARY KEY,
+                        ""FriendlyName"" TEXT,
+                        ""Xml"" TEXT
+                    );
+                ");
+                Console.WriteLine("? DataProtectionKeys table created.");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"?? Pre-initialization warning: {ex.Message}");
+    }
+    
+    // NOW configure Data Protection (table should exist by now)
     builder.Services.AddDataProtection()
         .PersistKeysToDbContext<ApplicationDbContext>()
         .SetApplicationName("EAD-Project");
@@ -101,6 +139,23 @@ try
                 Console.WriteLine("Applying database migrations...");
                 db.Database.Migrate();
                 Console.WriteLine("? Database migrations applied successfully.");
+                
+                // Ensure DataProtectionKeys exists after migration
+                try
+                {
+                    db.Database.ExecuteSqlRaw(@"
+                        CREATE TABLE IF NOT EXISTS ""DataProtectionKeys"" (
+                            ""Id"" SERIAL PRIMARY KEY,
+                            ""FriendlyName"" TEXT,
+                            ""Xml"" TEXT
+                        );
+                    ");
+                    Console.WriteLine("? DataProtectionKeys table verified after migration.");
+                }
+                catch (Exception dpEx)
+                {
+                    Console.WriteLine($"?? DataProtectionKeys table creation: {dpEx.Message}");
+                }
             }
             else
             {
@@ -194,7 +249,7 @@ try
                 }
             }
             
-            // Verify DataProtectionKeys table exists, create if missing
+            // Final verification: Ensure DataProtectionKeys table exists
             try
             {
                 var hasKeys = db.DataProtectionKeys.Any();
@@ -203,7 +258,7 @@ try
             catch (Exception ex)
             {
                 Console.WriteLine($"?? DataProtectionKeys table missing: {ex.Message}");
-                Console.WriteLine("Creating DataProtectionKeys table...");
+                Console.WriteLine("Creating DataProtectionKeys table as fallback...");
                 
                 try
                 {
