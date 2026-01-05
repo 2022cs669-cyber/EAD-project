@@ -89,7 +89,7 @@ try
         
         if (app.Environment.IsProduction())
         {
-            // Check if we should recreate the database to include DataProtectionKeys table
+            // Check if we should recreate the database
             var shouldRecreate = Environment.GetEnvironmentVariable("RECREATE_DB") == "true";
             if (shouldRecreate)
             {
@@ -98,9 +98,22 @@ try
                 Console.WriteLine("? Database deleted.");
             }
             
-            Console.WriteLine("Creating database schema...");
-            db.Database.EnsureCreated();
-            Console.WriteLine("? Database schema created successfully.");
+            Console.WriteLine("Applying database migrations...");
+            // Use Migrate() to apply migrations instead of EnsureCreated()
+            // This is more robust and handles schema changes properly
+            db.Database.Migrate();
+            Console.WriteLine("? Database migrations applied successfully.");
+            
+            // Verify DataProtectionKeys table exists
+            try
+            {
+                var hasKeys = db.DataProtectionKeys.Any();
+                Console.WriteLine($"? DataProtectionKeys table verified (contains {(hasKeys ? "data" : "no data")}).");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"?? DataProtectionKeys table check failed: {ex.Message}");
+            }
         }
         else
         {
@@ -126,6 +139,10 @@ catch (Exception ex)
 {
     Console.WriteLine($"? Database initialization error (will retry on first request): {ex.Message}");
     Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    if (ex.InnerException != null)
+    {
+        Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+    }
 }
 
 // Configure the HTTP request pipeline

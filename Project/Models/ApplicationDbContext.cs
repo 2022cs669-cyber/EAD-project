@@ -39,10 +39,11 @@ public partial class ApplicationDbContext : DbContext, IDataProtectionKeyContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure Data Protection Keys table
+        // Configure Data Protection Keys table with explicit table name for PostgreSQL compatibility
         modelBuilder.Entity<DataProtectionKey>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.ToTable("DataProtectionKeys");
         });
 
         modelBuilder.Entity<Attendance>(entity =>
