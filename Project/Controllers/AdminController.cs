@@ -281,7 +281,8 @@ namespace Project.Controllers
 
             if (ModelState.IsValid)
             {
-                cls.Created = DateTime.Now;
+                // Use UTC time for PostgreSQL compatibility
+                cls.Created = DateTime.UtcNow;
                 _context.Classes.Add(cls);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Classes));
