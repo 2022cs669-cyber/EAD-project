@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configure port for Render deployment
 var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
-builder.WebHost.UseUrls($"http://*:{port}]");
+builder.WebHost.UseUrls($"http://*:{port}");
 
 // Add services to the container
 builder.Services.AddControllersWithViews();
@@ -89,7 +89,15 @@ try
         
         if (app.Environment.IsProduction())
         {
-            // For PostgreSQL - create database if not exists (won't fail if tables exist)
+            // Delete and recreate database to include new DataProtectionKeys table
+            // This will clear all existing data - only do this once!
+            var shouldRecreate = Environment.GetEnvironmentVariable("RECREATE_DB") == "true";
+            if (shouldRecreate)
+            {
+                Console.WriteLine("Recreating database...");
+                db.Database.EnsureDeleted();
+            }
+            
             db.Database.EnsureCreated();
         }
         else
