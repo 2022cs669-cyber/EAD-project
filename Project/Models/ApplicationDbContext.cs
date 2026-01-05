@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 
 namespace Project.Models;
 
-public partial class ApplicationDbContext : DbContext
+public partial class ApplicationDbContext : DbContext, IDataProtectionKeyContext
 {
     public ApplicationDbContext()
     {
@@ -14,6 +15,9 @@ public partial class ApplicationDbContext : DbContext
         : base(options)
     {
     }
+
+    // Data Protection Keys table for session persistence across deployments
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
 
     public virtual DbSet<Attendance> Attendances { get; set; }
 

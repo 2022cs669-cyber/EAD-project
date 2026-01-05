@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Project.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure port for Render deployment
 var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
-builder.WebHost.UseUrls($"http://*:{port}");
+builder.WebHost.UseUrls($"http://*:{port}]");
 
 // Add services to the container
 builder.Services.AddControllersWithViews();
@@ -60,6 +61,11 @@ if (builder.Environment.IsProduction())
         // Suppress pending model changes warning for cross-database compatibility
         options.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
     });
+    
+    // Persist Data Protection keys to database for session persistence across deployments
+    builder.Services.AddDataProtection()
+        .PersistKeysToDbContext<ApplicationDbContext>()
+        .SetApplicationName("EAD-Project");
 }
 else
 {
