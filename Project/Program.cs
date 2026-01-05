@@ -72,8 +72,19 @@ if (builder.Environment.IsProduction())
         
         using (var tempDb = new ApplicationDbContext(optionsBuilder.Options))
         {
-            // Ensure database exists
-            tempDb.Database.EnsureCreated();
+            // Only ensure database exists, don't create all tables yet
+            try
+            {
+                var canConnect = tempDb.Database.CanConnect();
+                if (!canConnect)
+                {
+                    Console.WriteLine("Database doesn't exist yet, will be created during migration.");
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Database connection check skipped.");
+            }
             
             // Ensure DataProtectionKeys table exists
             try
@@ -84,14 +95,22 @@ if (builder.Environment.IsProduction())
             catch
             {
                 Console.WriteLine("Creating DataProtectionKeys table...");
-                tempDb.Database.ExecuteSqlRaw(@"
-                    CREATE TABLE IF NOT EXISTS ""DataProtectionKeys"" (
-                        ""Id"" SERIAL PRIMARY KEY,
-                        ""FriendlyName"" TEXT,
-                        ""Xml"" TEXT
-                    );
-                ");
-                Console.WriteLine("? DataProtectionKeys table created.");
+                try
+                {
+                    tempDb.Database.ExecuteSqlRaw(@"
+                        CREATE TABLE IF NOT EXISTS ""DataProtectionKeys"" (
+                            ""Id"" SERIAL PRIMARY KEY,
+                            ""FriendlyName"" TEXT,
+                            ""Xml"" TEXT
+                        );
+                    ");
+                    Console.WriteLine("? DataProtectionKeys table created.");
+                }
+                catch (Exception createEx)
+                {
+                    Console.WriteLine($"?? Could not create DataProtectionKeys table yet: {createEx.Message}");
+                    Console.WriteLine("Will be created during migration phase.");
+                }
             }
         }
     }
