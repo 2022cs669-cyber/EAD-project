@@ -1,13 +1,13 @@
 services:
   - type: web
     name: ead-project
-    env: docker
+    runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
     plan: free
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
-        value: Production
+        value: "Production"
       - key: ConnectionStrings__DefaultConnection
         fromDatabase:
           name: ead-database
