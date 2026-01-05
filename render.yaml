@@ -12,6 +12,8 @@ services:
         fromDatabase:
           name: ead-database
           property: connectionString
+      - key: RECREATE_DB
+        value: "true"
 
 databases:
   - name: ead-database
