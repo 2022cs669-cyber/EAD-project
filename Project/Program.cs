@@ -89,16 +89,18 @@ try
         
         if (app.Environment.IsProduction())
         {
-            // Delete and recreate database to include new DataProtectionKeys table
-            // This will clear all existing data - only do this once!
+            // Check if we should recreate the database to include DataProtectionKeys table
             var shouldRecreate = Environment.GetEnvironmentVariable("RECREATE_DB") == "true";
             if (shouldRecreate)
             {
-                Console.WriteLine("Recreating database...");
+                Console.WriteLine("?? RECREATE_DB is set to true. Deleting and recreating database...");
                 db.Database.EnsureDeleted();
+                Console.WriteLine("? Database deleted.");
             }
             
+            Console.WriteLine("Creating database schema...");
             db.Database.EnsureCreated();
+            Console.WriteLine("? Database schema created successfully.");
         }
         else
         {
@@ -122,7 +124,8 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"Database initialization error (will retry on first request): {ex.Message}");
+    Console.WriteLine($"? Database initialization error (will retry on first request): {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
 }
 
 // Configure the HTTP request pipeline

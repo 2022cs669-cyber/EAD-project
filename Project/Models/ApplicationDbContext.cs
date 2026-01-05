@@ -39,6 +39,12 @@ public partial class ApplicationDbContext : DbContext, IDataProtectionKeyContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Configure Data Protection Keys table
+        modelBuilder.Entity<DataProtectionKey>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
         modelBuilder.Entity<Attendance>(entity =>
         {
             entity.HasKey(e => e.Id);
